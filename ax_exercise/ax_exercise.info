@@ -1,0 +1,5 @@
+name = Axelerant Excercise
+description = Axelerant exercise by Sujith
+version = VERSION
+core = 7.x
+configure = admin/config/system/site-information

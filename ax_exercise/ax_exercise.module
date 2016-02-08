@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Axelerant exercise by Sujith.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function ax_exercise_menu() {
+	// MENU_ACCESS_DENIED is defined as 3 in menu.inc
+	//'page_json/%/%node' returns 404 HTML page for invalid nid. Hence explicitly loaded.
+	$items['page_json/%/%'] = array(
+		'access callback'   => 'ax_exercise_access_page',
+		'access arguments' => array(1),
+		'page callback'     => 'ax_exercise_get_page',
+		'page arguments' => array(2),
+		'delivery callback' => 'drupal_json_output',
+		'type' => MENU_CALLBACK
+	);
+
+	return $items;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function ax_exercise_form_alter(&$form, &$form_state, $form_id) {
+  if ('system_site_information_settings' == $form_id) {
+    $form['siteapikey'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Site API Key'),
+			'#default_value' => variable_get('siteapikey', 'No API Key yet'),
+		);
+		$form['actions']['submit']['#value'] = t('Update configuration');
+  }
+}
+
+/**
+ * Access callback
+ *
+ * @param $siteapikey
+ *   The site-api-key from URL.
+ *
+ * @return
+ *   TRUE if the site-api-key matches with the predefined variable;
+ *   FALSE otherwise.
+ */
+function ax_exercise_access_page($siteapikey) {
+	if (variable_get('siteapikey') == $siteapikey && $siteapikey != NULL) return TRUE;
+	return FALSE;
+}
+
+/**
+ * Page callback
+ *
+ * @param $nid
+ *   The node ID from URL.
+ *
+ * @return
+ *   Node object, if the node is of type 'page';
+ *   3 otherwise.
+ */
+function ax_exercise_get_page($nid) {
+	$node = node_load($nid);
+	if ($node && $node->type == 'page') return $node;
+	return MENU_ACCESS_DENIED;
+}
